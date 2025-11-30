@@ -1,16 +1,14 @@
-from fastapi import FastAPI
-from database import Base, engine
-from routers import users, patients, appointments, evolutions
+from fastapi.middleware.cors import CORSMiddleware
 
-Base.metadata.create_all(bind=engine)
-
-app = FastAPI()
-
-app.include_router(users.router)
-app.include_router(patients.router)
-app.include_router(appointments.router)
-app.include_router(evolutions.router)
-
-@app.get("/")
-def home():
-    return {"msg": "FisioManager Backend OK!"}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://fisiomanager-frontend1.onrender.com",
+        "http://localhost:3000",
+        "http://localhost:5500",
+        "*"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
