@@ -1,26 +1,19 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Importa suas rotas
-from routers.users import router as users_router
-from routers.patients import router as patients_router
-from routers.evolutions import router as evolutions_router
-from routers.appointments import router as appointments_router
+app = FastAPI()
 
-app = FastAPI(
-    title="FisioManager API",
-    description="Backend oficial do FisioManager Premium",
-    version="1.0.0"
-)
-
-# =====================================================
-# 🚀 CONFIGURAÇÃO CORRETA DE CORS PARA O RENDER
-# =====================================================
+# ============================================================
+# CORS — Libera o Frontend para acessar o Backend no Render
+# ============================================================
 origins = [
-    "https://fisiomanager-frontend1.onrender.com",
+    "https://fisiomanager-frontend1.onrender.com",       # SEU FRONTEND
+    "https://fisiomanager-backend.onrender.com",         # BACKEND OFICIAL
+    "https://fisiomanager-backend-nr.onrender.com",      # BACKEND SECUNDÁRIO DO RENDER
     "http://localhost:3000",
     "http://localhost:5500",
-    "*",  # Opcional, mas útil no desenvolvimento
+    "http://localhost",
+    "*"
 ]
 
 app.add_middleware(
@@ -31,18 +24,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# =====================================================
-# ROTAS REGISTRADAS
-# =====================================================
-app.include_router(users_router)
-app.include_router(patients_router)
-app.include_router(evolutions_router)
-app.include_router(appointments_router)
+# ============================================================
+# IMPORTS & ROTAS
+# ============================================================
+
+from routers import users, patients, evolutions, appointments  # se existirem
+
+app.include_router(users.router)
+app.include_router(patients.router)
+app.include_router(evolutions.router)
+app.include_router(appointments.router)
 
 
-# =====================================================
-# ROTA RAIZ PARA TESTE
-# =====================================================
 @app.get("/")
 def root():
-    return {"status": "online", "message": "Fisiomanager API rodando!"}
+    return {"message": "FisioManager Backend OK (CORS liberado)"}
+
