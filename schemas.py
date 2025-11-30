@@ -76,4 +76,23 @@ class Evolution(EvolutionBase):
     class Config:
         from_attributes = True
 
+# ======================================================
+# AGENDAMENTOS - SCHEMAS
+# ======================================================
 
+class AppointmentBase(BaseModel):
+    patient_id: int
+    date: str
+    time: str
+    notes: Optional[str] = None
+
+
+class AppointmentCreate(AppointmentBase):
+    pass
+
+
+class Appointment(AppointmentBase):
+    id: int
+
+    class Config:
+        orm_mode = True
