@@ -8,18 +8,22 @@ from auth import get_current_user
 
 router = APIRouter(prefix="/patients", tags=["Patients"])
 
-# --- CRIAR PACIENTE (Onde está o erro 500) ---
+# --- CRIAR PACIENTE (Onde está o erro) ---
 @router.post("/", response_model=schemas.PatientOut)
 def create_patient(
     patient: schemas.PatientCreate, 
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user)
 ):
-    # O código antigo tentava ler patient.age (que não existe mais).
-    # O código NOVO lê patient.birth_date, etc.
+    # Verifica se já existe um paciente com esse nome (opcional, para evitar duplicatas)
+    # db_patient_exists = db.query(models.Patient).filter(models.Patient.name == patient.name).first()
+    # if db_patient_exists:
+    #    raise HTTPException(status_code=400, detail="Paciente já cadastrado")
+
+    # Cria o objeto usando os campos NOVOS
     db_patient = models.Patient(
         name=patient.name,
-        birth_date=patient.birth_date, 
+        birth_date=patient.birth_date, # O Backend agora espera isso!
         sex=patient.sex,
         phone=patient.phone,
         insurance=patient.insurance
@@ -28,6 +32,8 @@ def create_patient(
     db.add(db_patient)
     db.commit()
     db.refresh(db_patient)
+    
+    # O Schema calcula a idade automaticamente na volta
     return db_patient
 
 # --- LISTAR ---
