@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, Date
 from sqlalchemy.orm import relationship
 from database import Base
+from datetime import date  # <--- IMPORTANTE
 
 # ======================================================
 # USUÁRIOS
@@ -13,23 +14,30 @@ class User(Base):
     hashed_password = Column(String)
 
 # ======================================================
-# PACIENTES (COM OS NOVOS CAMPOS)
+# PACIENTES
 # ======================================================
 class Patient(Base):
     __tablename__ = "patients"
 
     id = Column(Integer, primary_key=True, index=True)
     
-    # NOVOS CAMPOS AQUI
     name = Column(String, index=True)
-    birth_date = Column(Date, nullable=False)   # Data Nascimento
+    birth_date = Column(Date, nullable=False)   
     sex = Column(String, nullable=True)
     phone = Column(String, nullable=True)
-    insurance = Column(String, nullable=True)   # Convênio
+    insurance = Column(String, nullable=True)
 
-    # Relacionamentos
     evolutions = relationship("Evolution", back_populates="patient")
     appointments = relationship("Appointment", back_populates="patient")
+
+    # --- O SEGREDO DO FIX: CAMPO CALCULADO ---
+    @property
+    def idade(self):
+        if not self.birth_date:
+            return 0
+        today = date.today()
+        # Cálculo preciso da idade
+        return today.year - self.birth_date.year - ((today.month, today.day) < (self.birth_date.month, self.birth_date.day))
 
 # ======================================================
 # EVOLUÇÕES

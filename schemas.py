@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
-from typing import Optional
+from typing import Optional, List
 
 # =============================
 # AUTH
@@ -22,32 +22,20 @@ class AdminCreate(BaseModel):
 # =============================
 class PatientBase(BaseModel):
     name: str
-    birth_date: date            # Recebe data (AAAA-MM-DD)
+    birth_date: date            
     sex: Optional[str] = None
     phone: Optional[str] = None
-    insurance: Optional[str] = None # Antigo 'plan', agora 'insurance' (Convênio)
+    insurance: Optional[str] = None
 
 class PatientCreate(PatientBase):
     pass
 
 class PatientOut(PatientBase):
     id: int
-    idade: int # Campo extra que calcularemos automaticamente
+    idade: int  # O Pydantic agora vai ler isso da @property do model!
 
-    # Configuração deve ficar DENTRO da classe
     class Config:
         from_attributes = True
-
-    # Lógica para calcular a idade ao enviar a resposta
-    @staticmethod
-    def calculate_age(birth_date: date) -> int:
-        today = date.today()
-        return today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
-
-    def model_dump(self, **kwargs):
-        data = super().model_dump(**kwargs)
-        data['idade'] = self.calculate_age(self.birth_date)
-        return data
 
 # =============================
 # EVOLUTIONS
