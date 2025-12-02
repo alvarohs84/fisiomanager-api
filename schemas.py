@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import date, datetime
-from typing import Optional
+from typing import Optional, Dict, Any
 
 # AUTH
 class Token(BaseModel):
@@ -18,7 +18,6 @@ class AdminCreate(BaseModel):
 # PACIENTES
 class PatientBase(BaseModel):
     name: str
-    # Agora tudo é opcional exceto o nome
     birth_date: Optional[date] = None            
     sex: Optional[str] = None
     phone: Optional[str] = None
@@ -27,7 +26,7 @@ class PatientBase(BaseModel):
 class PatientCreate(PatientBase):
     pass
 
-class PatientUpdate(BaseModel): # Novo Schema para Edição
+class PatientUpdate(BaseModel):
     name: Optional[str] = None
     birth_date: Optional[date] = None
     sex: Optional[str] = None
@@ -75,16 +74,12 @@ class AppointmentOut(AppointmentBase):
     patient_name: str = "Desconhecido"
     class Config:
         from_attributes = True
-        
-        # ... (Mantenha os schemas anteriores) ...
 
-# =============================
-# FINANCEIRO (NOVO)
-# =============================
+# FINANCEIRO
 class TransactionBase(BaseModel):
     description: str
     amount: float
-    type: str # "entrada" ou "saida"
+    type: str
 
 class TransactionCreate(TransactionBase):
     pass
@@ -94,7 +89,20 @@ class TransactionOut(TransactionBase):
     date: datetime
     class Config:
         from_attributes = True
-        
 
+# AVALIAÇÕES (NOVO)
+class AssessmentCreate(BaseModel):
+    patient_id: int
+    specialty: str
+    content: Dict[str, Any] # Aceita qualquer JSON
+
+class AssessmentOut(BaseModel):
+    id: int
+    patient_id: int
+    specialty: str
+    content: Dict[str, Any]
+    date: datetime
+    class Config:
+        from_attributes = True
         
         

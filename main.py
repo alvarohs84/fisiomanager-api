@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from database import Base, engine, get_db
 import models
 import auth  # O arquivo de segurança que criamos
-from routers import users, patients, evolutions, appointments, finance
+from routers import users, patients, evolutions, appointments, finance, assessments
 
 # Cria as tabelas no banco de dados (se não existirem)
 Base.metadata.create_all(bind=engine)
@@ -85,4 +85,4 @@ app.include_router(patients.router)
 app.include_router(evolutions.router) 
 app.include_router(appointments.router)
 app.include_router(finance.router)
-
+app.include_router(assessments.router)

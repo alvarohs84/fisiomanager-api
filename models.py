@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Date, Float # <--- Adicionei Float aqui
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, Date, Float, JSON
 from sqlalchemy.orm import relationship
 from database import Base
 from datetime import date, datetime
@@ -22,20 +22,18 @@ class Patient(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     
-    # nullable=True permite cadastro rápido só com nome
     birth_date = Column(Date, nullable=True)   
     sex = Column(String, nullable=True)
     phone = Column(String, nullable=True)
     insurance = Column(String, nullable=True)
 
-    # Relacionamentos
     evolutions = relationship("Evolution", back_populates="patient", cascade="all, delete-orphan")
     appointments = relationship("Appointment", back_populates="patient", cascade="all, delete-orphan")
+    assessments = relationship("Assessment", back_populates="patient", cascade="all, delete-orphan")
 
     @property
     def idade(self):
-        if not self.birth_date:
-            return 0
+        if not self.birth_date: return 0
         today = date.today()
         return today.year - self.birth_date.year - ((today.month, today.day) < (self.birth_date.month, self.birth_date.day))
 
@@ -60,7 +58,6 @@ class Appointment(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     patient_id = Column(Integer, ForeignKey("patients.id"))
-    
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
     status = Column(String, default="Agendado")
@@ -76,6 +73,21 @@ class Transaction(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     description = Column(String, nullable=False)
-    amount = Column(Float, nullable=False) # Agora vai funcionar porque importamos Float
+    amount = Column(Float, nullable=False)
     type = Column(String, nullable=False)
     date = Column(DateTime, default=datetime.utcnow)
+
+# ======================================================
+# AVALIAÇÕES (NOVO)
+# ======================================================
+class Assessment(Base):
+    __tablename__ = "assessments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    patient_id = Column(Integer, ForeignKey("patients.id"))
+    
+    specialty = Column(String, nullable=False) # Ex: "Ortopedica"
+    content = Column(JSON, nullable=False)     # Salva as perguntas/respostas
+    date = Column(DateTime, default=datetime.utcnow)
+
+    patient = relationship("Patient", back_populates="assessments")
