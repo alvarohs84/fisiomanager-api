@@ -33,12 +33,13 @@ class Patient(Base):
 
     @property
     def idade(self):
-        if not self.birth_date: return 0
+        if not self.birth_date:
+            return 0
         today = date.today()
         return today.year - self.birth_date.year - ((today.month, today.day) < (self.birth_date.month, self.birth_date.day))
 
 # ======================================================
-# EVOLUÇÕES
+# EVOLUÇÕES (COM JSON)
 # ======================================================
 class Evolution(Base):
     __tablename__ = "evolutions"
@@ -46,6 +47,7 @@ class Evolution(Base):
     id = Column(Integer, primary_key=True, index=True)
     patient_id = Column(Integer, ForeignKey("patients.id"))
     description = Column(String, nullable=False)
+    content = Column(JSON, nullable=True) # Dados extras (EVA, MRC)
     date = Column(DateTime, default=datetime.utcnow)
 
     patient = relationship("Patient", back_populates="evolutions")
@@ -58,6 +60,7 @@ class Appointment(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     patient_id = Column(Integer, ForeignKey("patients.id"))
+    
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
     status = Column(String, default="Agendado")
@@ -78,7 +81,7 @@ class Transaction(Base):
     date = Column(DateTime, default=datetime.utcnow)
 
 # ======================================================
-# AVALIAÇÕES (NOVO)
+# AVALIAÇÕES
 # ======================================================
 class Assessment(Base):
     __tablename__ = "assessments"
@@ -86,22 +89,8 @@ class Assessment(Base):
     id = Column(Integer, primary_key=True, index=True)
     patient_id = Column(Integer, ForeignKey("patients.id"))
     
-    specialty = Column(String, nullable=False) # Ex: "Ortopedica"
-    content = Column(JSON, nullable=False)     # Salva as perguntas/respostas
+    specialty = Column(String, nullable=False)
+    content = Column(JSON, nullable=False)
     date = Column(DateTime, default=datetime.utcnow)
 
     patient = relationship("Patient", back_populates="assessments")
-    
-class Evolution(Base):
-    __tablename__ = "evolutions"
-
-    id = Column(Integer, primary_key=True, index=True)
-    patient_id = Column(Integer, ForeignKey("patients.id"))
-    description = Column(String, nullable=False) # Texto livre
-    
-    # NOVO: Campo para guardar EVA, MRC e Goniometria estruturados
-    content = Column(JSON, nullable=True) 
-    
-    date = Column(DateTime, default=datetime.utcnow)
-
-    patient = relationship("Patient", back_populates="evolutions")

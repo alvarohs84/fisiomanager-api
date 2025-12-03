@@ -126,6 +126,6 @@ class EvolutionOut(BaseModel):
     content: Optional[Dict[str, Any]] = None # Devolve o JSON
     date: datetime
     class Config:
-        from_attributes = True
+        from_attributes = True 
         
         
