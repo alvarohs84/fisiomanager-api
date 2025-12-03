@@ -19,7 +19,7 @@ def create_evolution(evo: schemas.EvolutionCreate, db: Session = Depends(get_db)
     db_evo = models.Evolution(
         patient_id=evo.patient_id,
         description=evo.description,
-        content=evo.content # <--- Salvando os dados extras
+        content=evo.content # JSON
     )
     db.add(db_evo)
     db.commit()

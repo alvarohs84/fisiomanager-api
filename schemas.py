@@ -22,6 +22,8 @@ class PatientBase(BaseModel):
     sex: Optional[str] = None
     phone: Optional[str] = None
     insurance: Optional[str] = None
+    medical_diagnosis: Optional[str] = None       # Novo
+    functional_diagnosis: Optional[str] = None    # Novo
 
 class PatientCreate(PatientBase):
     pass
@@ -32,6 +34,8 @@ class PatientUpdate(BaseModel):
     sex: Optional[str] = None
     phone: Optional[str] = None
     insurance: Optional[str] = None
+    medical_diagnosis: Optional[str] = None       # Novo
+    functional_diagnosis: Optional[str] = None    # Novo
 
 class PatientOut(PatientBase):
     id: int
@@ -43,11 +47,13 @@ class PatientOut(PatientBase):
 class EvolutionCreate(BaseModel):
     patient_id: int
     description: str
+    content: Optional[Dict[str, Any]] = None
 
 class EvolutionOut(BaseModel):
     id: int
     patient_id: int
     description: str
+    content: Optional[Dict[str, Any]] = None
     date: datetime
     class Config:
         from_attributes = True
@@ -90,11 +96,11 @@ class TransactionOut(TransactionBase):
     class Config:
         from_attributes = True
 
-# AVALIAÇÕES (NOVO)
+# AVALIAÇÕES
 class AssessmentCreate(BaseModel):
     patient_id: int
     specialty: str
-    content: Dict[str, Any] # Aceita qualquer JSON
+    content: Dict[str, Any]
 
 class AssessmentOut(BaseModel):
     id: int
@@ -104,28 +110,10 @@ class AssessmentOut(BaseModel):
     date: datetime
     class Config:
         from_attributes = True
-        
-        # =============================
-# USUÁRIOS (UPDATE)
-# =============================
+
+# USUÁRIOS
 class UserPasswordUpdate(BaseModel):
     old_password: str
     new_password: str
-    
-    # EVOLUÇÕES
-# =============================
-class EvolutionCreate(BaseModel):
-    patient_id: int
-    description: str
-    content: Optional[Dict[str, Any]] = None # Agora aceita JSON opcional
-
-class EvolutionOut(BaseModel):
-    id: int
-    patient_id: int
-    description: str
-    content: Optional[Dict[str, Any]] = None # Devolve o JSON
-    date: datetime
-    class Config:
-        from_attributes = True 
         
         
